@@ -7,11 +7,20 @@ Writes DRM (monthly market risk report) XML file, as required from Brazilian Cen
 ```julia
 ativo = [
     BacenDRM.ItemCarteira(
-        :A20, nothing, :JM1, :offshore, :banking,
+        :A20,      # item::Symbol
+        nothing,   # id_posicao::SymbolOrNothing
+        :JM1,      # fator_risco::Symbol
+        :offshore, # local_registro::SymbolOrNothing
+        :banking,  # carteira_negoc::Symbol
+        # BacenDRM.FluxoVertice(cod_vertice::Symbol, valor_alocado::Float64, valor_mam::Float64)
         [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
     )
     BacenDRM.ItemCarteira(
-        :A30, nothing, :ME1, :offshore, :banking,
+        :A30,      # item::Symbol
+        nothing,   # id_posicao::SymbolOrNothing
+        :ME1,      # fator_risco::Symbol
+        :offshore, # local_registro::SymbolOrNothing
+        :banking,  # carteira_negoc::Symbol
         [
             BacenDRM.FluxoVertice(Symbol("3"), 100.0, 0.0)
             BacenDRM.FluxoVertice(Symbol("12"), 100.0, 10.0)
@@ -21,28 +30,44 @@ ativo = [
 
 passivo = [
     BacenDRM.ItemCarteira(
-        :P30, nothing, :JM1, :onshore_sem_clearing, :trading,
+        :P30,                  # item::Symbol
+        nothing,               # id_posicao::SymbolOrNothing
+        :JM1,                  # fator_risco::Symbol
+        :onshore_sem_clearing, # local_registro::SymbolOrNothing
+        :trading,              # carteira_negoc::Symbol
         [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
     )
 ]
 
 derivativo = [
     BacenDRM.ItemCarteira(
-        :D41, :C, :JM1, :onshore_clearing, :banking,
+        :     D41,         # item::Symbol
+        :C,                # id_posicao::SymbolOrNothing
+        :JM1,              # fator_risco::Symbol
+        :onshore_clearing, # local_registro::SymbolOrNothing
+        :banking,          # carteira_negoc::Symbol
         [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
     )
 ]
 
 ativo_fundo = [
     BacenDRM.ItemCarteira(
-        :A90, nothing, :JM1, :offshore, :banking,
+        :A90,      # item::Symbol
+        nothing,   # id_posicao::SymbolOrNothing
+        :JM1,      # fator_risco::Symbol
+        :offshore, # local_registro::SymbolOrNothing
+        :banking,  # carteira_negoc::Symbol
         [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
     )
 ]
 
 atividade_financeira = [
     BacenDRM.ItemCarteira(
-        :AFC, :V, :JM1, nothing, :banking,
+        :     AFC, # item::Symbol
+        :V,        # id_posicao::SymbolOrNothing
+        :JM1,      # fator_risco::Symbol
+        nothing,   # local_registro::SymbolOrNothing
+        :banking,  # carteira_negoc::Symbol
         [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
     )
 ]
