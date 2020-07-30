@@ -26,24 +26,28 @@ ativo = [
         ]
     )
 ]
+
 passivo = [
     BacenDRM.ItemCarteira(
         :P30, nothing, :JM1, :onshore_sem_clearing, :trading,
         [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
     )
 ]
+
 derivativo = [
     BacenDRM.ItemCarteira(
         :D41, :C, :JM1, :onshore_clearing, :banking,
         [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
     )
 ]
+
 ativo_fundo = [
     BacenDRM.ItemCarteira(
         :A90, nothing, :JM1, :offshore, :banking,
         [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
     )
 ]
+
 atividade_financeira = [
     BacenDRM.ItemCarteira(
         :AFC, :V, :JM1, nothing, :banking,

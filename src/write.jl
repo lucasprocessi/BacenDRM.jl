@@ -84,6 +84,5 @@ end
 
 _trunc_to_thousands(x::Float64)::Int64 = Int64(trunc(x/1000))
 
-
 write_xml(io::IO, doc::Documento) = prettyprint(io, to_xml(doc))
 write_xml(path::String, doc::Documento) = open(path, "w+") do io write_xml(io, doc) end
