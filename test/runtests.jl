@@ -5,28 +5,28 @@ using BacenDRM
 
 @testset "Fluxo Vertice" begin
 
-    v1 = BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)
+    v1 = BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)
     @test v1.cod_vertice == Symbol("1")
-    @test v1.valor_alocado == 100.0
-    @test v1.valor_mam == 0.0
+    @test v1.valor_alocado == 100_000.0
+    @test v1.valor_mam == 0_000.0
 
-    v12 = BacenDRM.FluxoVertice(Symbol("12"), 200.0, 20.0)
+    v12 = BacenDRM.FluxoVertice(Symbol("12"), 200_000.0, 20_000.0)
     @test v12.cod_vertice == Symbol("12")
-    @test v12.valor_alocado == 200.0
-    @test v12.valor_mam == 20.0
+    @test v12.valor_alocado == 200_000.0
+    @test v12.valor_mam == 20_000.0
 
     invalid_code = Symbol("13")
     # codigo invalido
-    @test_throws AssertionError BacenDRM.FluxoVertice(invalid_code, 200.0, 20.0)
+    @test_throws AssertionError BacenDRM.FluxoVertice(invalid_code, 200_000.0, 20_000.0)
     # valor mam invalido
-    @test_throws AssertionError BacenDRM.FluxoVertice(Symbol("2"), 200.0, 20.0)
+    @test_throws AssertionError BacenDRM.FluxoVertice(Symbol("2"), 200_000.0, 20_000.0)
 
 end
 
 @testset "Item Carteira" begin
 
-    v1 = BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)
-    v12 = BacenDRM.FluxoVertice(Symbol("12"), 200.0, 20.0)
+    v1 = BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)
+    v12 = BacenDRM.FluxoVertice(Symbol("12"), 200_000.0, 20_000.0)
 
     ic = BacenDRM.ItemCarteira(
         :A20,              # item::Symbol
@@ -48,7 +48,7 @@ end
         [v1; v12]           # fluxos::Vector{FluxoVertice}
     )
 
-    @test ic2.fluxos[1].valor_alocado == 100.0
+    @test ic2.fluxos[1].valor_alocado == 100_000.0
 
 end
 
@@ -57,38 +57,38 @@ end
     ativo = [
         BacenDRM.ItemCarteira(
             :A20, nothing, :JM1, :offshore, :banking,
-            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+            [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
         )
         BacenDRM.ItemCarteira(
             :A30, nothing, :ME1, :offshore, :banking,
             [
-                BacenDRM.FluxoVertice(Symbol("3"), 100.0, 0.0)
-                BacenDRM.FluxoVertice(Symbol("12"), 100.0, 10.0)
+                BacenDRM.FluxoVertice(Symbol("3"), 100_000.0, 0_000.0)
+                BacenDRM.FluxoVertice(Symbol("12"), 100_000.0, 10_000.0)
             ]
         )
     ]
     passivo = [
         BacenDRM.ItemCarteira(
             :P30, nothing, :JM1, :onshore_sem_clearing, :trading,
-            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+            [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
         )
     ]
     derivativo = [
         BacenDRM.ItemCarteira(
             :D41, :C, :JM1, :onshore_clearing, :banking,
-            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+            [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
         )
     ]
     ativo_fundo = [
         BacenDRM.ItemCarteira(
             :A90, nothing, :JM1, :offshore, :banking,
-            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+            [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
         )
     ]
     atividade_financeira = [
         BacenDRM.ItemCarteira(
             :AFC, :V, :JM1, nothing, :banking,
-            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+            [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
         )
     ]
 
@@ -116,38 +116,38 @@ end
     ativo = [
         BacenDRM.ItemCarteira(
             :A20, nothing, :JM1, :offshore, :banking,
-            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+            [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
         )
         BacenDRM.ItemCarteira(
             :A30, nothing, :ME1, :offshore, :banking,
             [
-                BacenDRM.FluxoVertice(Symbol("3"), 100.0, 0.0)
-                BacenDRM.FluxoVertice(Symbol("12"), 100.0, 10.0)
+                BacenDRM.FluxoVertice(Symbol("3"), 100_000.0, 0_000.0)
+                BacenDRM.FluxoVertice(Symbol("12"), 100_000.0, 10_000.0)
             ]
         )
     ]
     passivo = [
         BacenDRM.ItemCarteira(
             :P30, nothing, :JM1, :onshore_sem_clearing, :trading,
-            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+            [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
         )
     ]
     derivativo = [
         BacenDRM.ItemCarteira(
             :D41, :C, :JM1, :onshore_clearing, :banking,
-            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+            [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
         )
     ]
     ativo_fundo = [
         BacenDRM.ItemCarteira(
             :A90, nothing, :JM1, :offshore, :banking,
-            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+            [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
         )
     ]
     atividade_financeira = [
         BacenDRM.ItemCarteira(
             :AFC, :V, :JM1, nothing, :banking,
-            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+            [BacenDRM.FluxoVertice(Symbol("1"), 100_000.0, 0_000.0)]
         )
     ]
 
@@ -192,31 +192,31 @@ end
       <FoneContato>555-1234</FoneContato>
       <Ativo>
         <ItemCarteira Item="A20" FatorRisco="JM1" LocalRegistro="03" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="1" ValorAlocado="100.0"/>
+          <FluxoVertice CodVertice="1" ValorAlocado="100"/>
         </ItemCarteira>
         <ItemCarteira Item="A30" FatorRisco="ME1" LocalRegistro="03" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="3" ValorAlocado="100.0"/>
-          <FluxoVertice CodVertice="12" ValorAlocado="100.0" ValorMaM="10.0"/>
+          <FluxoVertice CodVertice="3" ValorAlocado="100"/>
+          <FluxoVertice CodVertice="12" ValorAlocado="100" ValorMaM="10"/>
         </ItemCarteira>
       </Ativo>
       <Passivo>
         <ItemCarteira Item="P30" FatorRisco="JM1" LocalRegistro="02" CarteiraNegoc="01">
-          <FluxoVertice CodVertice="1" ValorAlocado="100.0"/>
+          <FluxoVertice CodVertice="1" ValorAlocado="100"/>
         </ItemCarteira>
       </Passivo>
       <Derivativo>
         <ItemCarteira Item="D41" IdPosicao="C" FatorRisco="JM1" LocalRegistro="01" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="1" ValorAlocado="100.0"/>
+          <FluxoVertice CodVertice="1" ValorAlocado="100"/>
         </ItemCarteira>
       </Derivativo>
       <AtivoFundo>
         <ItemCarteira Item="A90" FatorRisco="JM1" LocalRegistro="03" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="1" ValorAlocado="100.0"/>
+          <FluxoVertice CodVertice="1" ValorAlocado="100"/>
         </ItemCarteira>
       </AtivoFundo>
       <AtividadeFinanceira>
         <ItemCarteira Item="AFC" IdPosicao="V" FatorRisco="JM1" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="1" ValorAlocado="100.0"/>
+          <FluxoVertice CodVertice="1" ValorAlocado="100"/>
         </ItemCarteira>
       </AtividadeFinanceira>
     </DocDRM>

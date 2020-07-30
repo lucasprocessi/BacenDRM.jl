@@ -65,8 +65,8 @@ end
 function _add_fluxo_vertice!(node::EzXML.Node, fv::FluxoVertice)
     node_fv = addelement!(node, "FluxoVertice")
     link!(node_fv, AttributeNode("CodVertice", "$(fv.cod_vertice)"))
-    link!(node_fv, AttributeNode("ValorAlocado", "$(fv.valor_alocado)"))
-    fv.valor_mam > eps() && link!(node_fv, AttributeNode("ValorMaM", "$(fv.valor_mam)"))
+    link!(node_fv, AttributeNode("ValorAlocado", "$(_trunc_to_thousands(fv.valor_alocado))"))
+    fv.valor_mam > eps() && link!(node_fv, AttributeNode("ValorMaM", "$(_trunc_to_thousands(fv.valor_mam))"))
     return node
 end
 
@@ -81,6 +81,9 @@ function _encode_carteira_negoc(x::Symbol)::String
     @assert haskey(DECODE_CARTEIRAS, x) "carteira negoc invalida: $x"
     return DECODE_CARTEIRAS[x]
 end
+
+_trunc_to_thousands(x::Float64)::Int64 = Int64(trunc(x/1000))
+
 
 write_xml(io::IO, doc::Documento) = prettyprint(io, to_xml(doc))
 write_xml(path::String, doc::Documento) = open(path, "w+") do io write_xml(io, doc) end
