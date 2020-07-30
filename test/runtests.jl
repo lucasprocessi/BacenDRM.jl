@@ -53,11 +53,36 @@ end
 
 @testset "Documento" begin
 
-    ativo = Vector{BacenDRM.ItemCarteira}()
-    passivo = Vector{BacenDRM.ItemCarteira}()
-    derivativo = Vector{BacenDRM.ItemCarteira}()
-    ativo_fundo = Vector{BacenDRM.ItemCarteira}()
-    atividade_financeira = Vector{BacenDRM.ItemCarteira}()
+    ativo = [
+        BacenDRM.ItemCarteira(
+            :A20, nothing, :JM1, :offshore, :banking,
+            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+        )
+    ]
+    passivo = [
+        BacenDRM.ItemCarteira(
+            :P30, nothing, :JM1, :onshore_sem_clearing, :trading,
+            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+        )
+    ]
+    derivativo = [
+        BacenDRM.ItemCarteira(
+            :D41, :C, :JM1, :onshore_clearing, :banking,
+            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+        )
+    ]
+    ativo_fundo = [
+        BacenDRM.ItemCarteira(
+            :A90, nothing, :JM1, :offshore, :banking,
+            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+        )
+    ]
+    atividade_financeira = [
+        BacenDRM.ItemCarteira(
+            :AFC, :V, :JM1, nothing, :banking,
+            [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
+        )
+    ]
 
     doc = BacenDRM.Documento(
         "2060",              # id_docto::String,
@@ -75,5 +100,5 @@ end
     )
 
     @test doc.id_docto == "2060"
-    @test length(doc.ativo) == 0
+    @test length(doc.ativo) == 1
 end

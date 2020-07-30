@@ -1,6 +1,4 @@
 
-const CONTAS_ATIVO   = [:A10, :A20, :A30, :A40, :A50, :A90]
-const CONTAS_PASSIVO = [:P10, :P20, :P30, :P40, :P50, :P90]
 const FATORES_RISCO = [
     :JJ1
     :JM1
@@ -43,7 +41,7 @@ const FATORES_RISCO = [
     Symbol("999")
 ]
 
-const LOCAIS_REGISTRO = [:onshore_clearing, :onshore_no_clearing, :offshore]
+const LOCAIS_REGISTRO = [:onshore_clearing, :onshore_sem_clearing, :offshore]
 const DECODE_LOCAIS_REGISTRO = Dict{Symbol, String}([
     :onshore_clearing    => "01"
     :onshore_no_clearing => "02"
@@ -58,7 +56,11 @@ const DECODE_CARTEIRAS = Dict{Symbol, String}([
 
 const VERTICES = [Symbol(n) for n in 1:12]
 
-const CONTAS_DERIVATIVOS = [
+const POSICOES = [:C, :V, :NA]
+
+const CONTAS_ATIVO   = [:A10, :A20, :A30, :A40, :A50, :A90]
+const CONTAS_PASSIVO = [:P10, :P20, :P30, :P40, :P50, :P90]
+const CONTAS_DERIVATIVO = [
     :D10
     :D20
     :D30
@@ -73,5 +75,6 @@ const CONTAS_DERIVATIVOS = [
     :D60
     :D90
 ]
+const CONTAS_ATIVIDADE_FINANCEIRA = [:AFC]
 
-const POSICOES = [:C, :V, :NA]
+const CONTAS = [CONTAS_ATIVO; CONTAS_PASSIVO; CONTAS_DERIVATIVO; CONTAS_ATIVIDADE_FINANCEIRA]

@@ -29,7 +29,7 @@ struct ItemCarteira
         carteira_negoc::Symbol,
         fluxos::Vector{FluxoVertice})
 
-        @assert item in [CONTAS_ATIVO; CONTAS_PASSIVO; CONTAS_DERIVATIVOS] "item invalido: $item"
+        @assert item in CONTAS "item invalido: $item"
         id_posicao != nothing && @assert id_posicao in POSICOES "posicao invalida: $id_posicao"
         @assert fator_risco in FATORES_RISCO "fator de risco invalido: $fator_risco"
         local_registro != nothing && @assert local_registro in LOCAIS_REGISTRO "local_registro invalido: $local_registro"
@@ -75,22 +75,27 @@ struct Documento
         @assert fone_contato != "" "telefone contato obrigatorio"
 
         for ic in ativo
+            @assert ic.item in CONTAS_ATIVO "conta de ativo invalida: $(ic.item)"
             @assert ic.id_posicao == nothing "$ic nao pode ter id_posicao"
             @assert ic.local_registro != nothing "$ic deve ter local_registro"
         end
         for ic in passivo
+            @assert ic.item in CONTAS_PASSIVO "conta de passivo invalida: $(ic.item)"
             @assert ic.id_posicao == nothing "$ic nao pode ter id_posicao"
             @assert ic.local_registro != nothing "$ic deve ter local_registro"
         end
         for ic in derivativo
+            @assert ic.item in CONTAS_DERIVATIVO "conta de derivativo invalida: $(ic.item)"
             @assert ic.id_posicao != nothing "$ic deve ter id_posicao"
             @assert ic.local_registro != nothing "$ic deve ter local_registro"
         end
         for ic in ativo_fundo
+            @assert ic.item in CONTAS_ATIVO "conta de ativo de fundo invalida: $(ic.item)"
             @assert ic.id_posicao == nothing "$ic nao pode ter id_posicao"
             @assert ic.local_registro != nothing "$ic deve ter local_registro"
         end
         for ic in atividade_financeira
+            @assert ic.item in CONTAS_ATIVIDADE_FINANCEIRA "conta de atividade financeira invalida: $(ic.item)"
             @assert ic.id_posicao != nothing "$ic deve ter id_posicao"
             @assert ic.local_registro == nothing "$ic nao pode ter local_registro"
         end
