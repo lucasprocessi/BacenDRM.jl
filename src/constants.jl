@@ -54,7 +54,20 @@ const DECODE_CARTEIRAS = Dict{Symbol, String}([
     :banking => "02"
 ])
 
-const VERTICES = [Symbol(n) for n in 1:12]
+const VERTICES = [
+    Symbol("01")
+    Symbol("02")
+    Symbol("03")
+    Symbol("04")
+    Symbol("05")
+    Symbol("06")
+    Symbol("07")
+    Symbol("08")
+    Symbol("09")
+    Symbol("10")
+    Symbol("11")
+    Symbol("12")
+]
 
 const POSICOES = [:C, :V, :NA]
 

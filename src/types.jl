@@ -10,6 +10,20 @@ struct FluxoVertice
         valor_mam > eps() && @assert cod_vertice == Symbol("12") "apenas o vertice :12 pode ter valor MaM maior que zero"
         new(cod_vertice, valor_alocado, valor_mam)
     end
+    function FluxoVertice(cod_vertice::Int64, valor_alocado::Float64, valor_mam::Float64)
+        return FluxoVertice(get_codigo_vertice(cod_vertice), valor_alocado, valor_mam)
+    end
+end
+
+function get_codigo_vertice(v::Int64)::Symbol
+    @assert v >= 1
+    @assert v <= 12
+    if v < 10
+        # add leading zero
+        return Symbol("0$v")
+    else
+        return Symbol("$v")
+    end
 end
 
 SymbolOrNothing = Union{Symbol, Nothing}
