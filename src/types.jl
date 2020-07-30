@@ -84,7 +84,7 @@ struct Documento
         @assert id_docto in ["2060"] "id documento invalido: $id_docto"
         @assert occursin(r"^v\d+$", id_docto_versao) "versao documento invalida: $id_docto_versao. exemplo: v1"
         @assert occursin(r"^\d{4}-\d{2}", data_base) "data base invalida: $data_base. exemplo: 2020-06"
-        @assert tipo_arq in [:I] "tipo arquivo invalido: $tipo_arq"
+        @assert tipo_arq in TIPOS_ARQUIVO "tipo arquivo invalido: $tipo_arq"
         @assert nome_contato != "" "nome contato obrigatorio"
         @assert fone_contato != "" "telefone contato obrigatorio"
 
