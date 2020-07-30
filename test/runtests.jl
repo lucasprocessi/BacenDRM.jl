@@ -224,6 +224,10 @@ end
 
     @test _is_equal(doc, str_xml)
 
-    #BacenDRM.write_xml(Base.stdout, doc)
+    #BacenDRM.write_xml(Base.stdout, doc) # debug
+
+    file = tempname()
+    BacenDRM.write_xml(file, doc)
+    rm(file)
 
 end
