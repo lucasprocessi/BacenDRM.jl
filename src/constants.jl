@@ -43,9 +43,9 @@ const FATORES_RISCO = [
 
 const LOCAIS_REGISTRO = [:onshore_clearing, :onshore_sem_clearing, :offshore]
 const DECODE_LOCAIS_REGISTRO = Dict{Symbol, String}([
-    :onshore_clearing    => "01"
-    :onshore_no_clearing => "02"
-    :offshore            => "03"
+    :onshore_clearing     => "01"
+    :onshore_sem_clearing => "02"
+    :offshore             => "03"
 ])
 
 const CARTEIRAS = [:trading, :banking]
