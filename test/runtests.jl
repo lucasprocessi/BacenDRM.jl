@@ -50,3 +50,30 @@ end
 	@test ic2.fluxos[1].valor_alocado == 100.0
 
 end
+
+@testset "Documento" begin
+
+	ativo = Vector{BacenDRM.ItemCarteira}()
+	passivo = Vector{BacenDRM.ItemCarteira}()
+	derivativo = Vector{BacenDRM.ItemCarteira}()
+	ativo_fundo = Vector{BacenDRM.ItemCarteira}()
+	atividade_financeira = Vector{BacenDRM.ItemCarteira}()
+
+    doc = BacenDRM.Documento(
+    	"2060",              # id_docto::String,
+    	"v1",                # id_docto_versao::String,
+    	"2020-06",           # data_base::String,
+    	123456,              # id_inst_financ::Int64,
+    	:I,                  # tipo_arq::Symbol,
+    	"Fulano",            # nome_contato::String,
+    	"555-1234",          # fone_contato::String,
+    	ativo,               # ativo::Vector{ItemCarteira},
+    	passivo,             # passivo::Vector{ItemCarteira},
+    	derivativo,          # derivativo::Vector{ItemCarteira},
+    	ativo_fundo,         # ativo_fundo::Vector{ItemCarteira},
+    	atividade_financeira # atividade_financeira::Vector{ItemCarteira}
+    )
+
+    @test doc.id_docto == "2060"
+    @test length(doc.ativo) == 0
+end
