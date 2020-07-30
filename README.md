@@ -90,7 +90,7 @@ doc = BacenDRM.Documento(
 BacenDRM.write_xml("DRM.xml", doc)
 ```
 
-#### DRM.xml
+#### Content of "DRM.xml"
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
