@@ -58,6 +58,13 @@ end
             :A20, nothing, :JM1, :offshore, :banking,
             [BacenDRM.FluxoVertice(Symbol("1"), 100.0, 0.0)]
         )
+        BacenDRM.ItemCarteira(
+            :A30, nothing, :ME1, :offshore, :banking,
+            [
+                BacenDRM.FluxoVertice(Symbol("3"), 100.0, 0.0)
+                BacenDRM.FluxoVertice(Symbol("12"), 100.0, 10.0)
+            ]
+        )
     ]
     passivo = [
         BacenDRM.ItemCarteira(
@@ -100,5 +107,6 @@ end
     )
 
     @test doc.id_docto == "2060"
-    @test length(doc.ativo) == 1
+    @test length(doc.ativo) == 2
+
 end
