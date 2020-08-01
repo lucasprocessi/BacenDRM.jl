@@ -231,3 +231,67 @@ end
     rm(file)
 
 end
+
+@testset "Write CSV" begin
+    ativo = [
+        BacenDRM.ItemCarteira(
+            :A20, nothing, :JM1, :offshore, :banking,
+            [BacenDRM.FluxoVertice(1, 100_000.0, 0_000.0)]
+        )
+        BacenDRM.ItemCarteira(
+            :A30, nothing, :ME1, :offshore, :banking,
+            [
+                BacenDRM.FluxoVertice(3, 100_000.0, 0_000.0)
+                BacenDRM.FluxoVertice(12, 100_000.0, 10_000.0)
+            ]
+        )
+    ]
+    passivo = [
+        BacenDRM.ItemCarteira(
+            :P30, nothing, :JM1, :onshore_sem_clearing, :trading,
+            [BacenDRM.FluxoVertice(1, 100_000.0, 0_000.0)]
+        )
+    ]
+    derivativo = [
+        BacenDRM.ItemCarteira(
+            :D41, :C, :JM1, :onshore_clearing, :banking,
+            [BacenDRM.FluxoVertice(1, 100_000.0, 0_000.0)]
+        )
+    ]
+    ativo_fundo = [
+        BacenDRM.ItemCarteira(
+            :A90, nothing, :JM1, :offshore, :banking,
+            [BacenDRM.FluxoVertice(1, 100_000.0, 0_000.0)]
+        )
+    ]
+    atividade_financeira = [
+        BacenDRM.ItemCarteira(
+            :AFC, :V, :JM1, nothing, :banking,
+            [BacenDRM.FluxoVertice(1, 100_000.0, 0_000.0)]
+        )
+    ]
+
+    doc = BacenDRM.Documento(
+        "2060",              # id_docto::String,
+        "v1",                # id_docto_versao::String,
+        "2020-06",           # data_base::String,
+        123456,              # id_inst_financ::Int64,
+        :I,                  # tipo_arq::Symbol,
+        "Fulano",            # nome_contato::String,
+        "555-1234",          # fone_contato::String,
+        ativo,               # ativo::Vector{ItemCarteira},
+        passivo,             # passivo::Vector{ItemCarteira},
+        derivativo,          # derivativo::Vector{ItemCarteira},
+        ativo_fundo,         # ativo_fundo::Vector{ItemCarteira},
+        atividade_financeira # atividade_financeira::Vector{ItemCarteira}
+    )
+
+    #BacenDRM.write_csv(Base.stdout, doc) # debug
+    #BacenDRM.write_csv("drm.csv", doc)   # debug
+
+    file = tempname()
+    BacenDRM.write_csv(file, doc)
+    @test isfile(file)
+    rm(file)
+
+end
