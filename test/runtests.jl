@@ -295,3 +295,60 @@ end
     rm(file)
 
 end
+
+@testset "ItemCarteira Helpers" begin
+
+    # item::Symbol
+    # id_posicao::SymbolOrNothing
+    # fator_risco::Symbol
+    # local_registro::SymbolOrNothing
+    # carteira_negoc::Symbol
+    # fluxos::Vector{FluxoVertice}
+
+    # same_item()
+    @test BacenDRM.same_item(
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}()),
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}())
+    )
+
+    @test !BacenDRM.same_item(
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}()),
+        BacenDRM.ItemCarteira(:P10, nothing, :JJ1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}())
+    )
+
+    @test !BacenDRM.same_item(
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}()),
+        BacenDRM.ItemCarteira(:A10, :C, :JJ1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}())
+    )
+
+    @test !BacenDRM.same_item(
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}()),
+        BacenDRM.ItemCarteira(:A10, nothing, :JP1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}())
+    )
+
+    @test !BacenDRM.same_item(
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}()),
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, :onshore_clearing, :trading, Vector{BacenDRM.FluxoVertice}())
+    )
+
+    @test !BacenDRM.same_item(
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}()),
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, :offshore, :banking, Vector{BacenDRM.FluxoVertice}())
+    )
+
+    @test !BacenDRM.same_item(
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}()),
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, nothing, :trading, Vector{BacenDRM.FluxoVertice}())
+    )
+
+    @test BacenDRM.same_item(
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, nothing, :trading, Vector{BacenDRM.FluxoVertice}()),
+        BacenDRM.ItemCarteira(:A10, nothing, :JJ1, nothing, :trading, Vector{BacenDRM.FluxoVertice}())
+    )
+
+    @test !BacenDRM.same_item(
+        BacenDRM.ItemCarteira(:A10, :C, :JJ1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}()),
+        BacenDRM.ItemCarteira(:A10, :V, :JJ1, :offshore, :trading, Vector{BacenDRM.FluxoVertice}())
+    )
+
+end
