@@ -211,7 +211,7 @@ end
         BacenDRM.ItemCarteira(:A30, nothing, :ME1, :offshore, :banking) => BacenDRM.Fluxos(Dict([3 => BacenDRM.Vertice(100_000.0, 0_000.0), 12 => BacenDRM.Vertice(100_000.0, 10_000.0)]))
     ])
     passivo = Dict([
-        BacenDRM.ItemCarteira(:P30, nothing, :JM1, :onshore_sem_clearing, :trading) => BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
+        BacenDRM.ItemCarteira(:P30, nothing, :JM1, :onshore_sem_clearing, :trading) => BacenDRM.Fluxos(Dict([Symbol("01") => BacenDRM.Vertice(100_000.0, 0_000.0)]))
     ])
     derivativo = Dict([
         BacenDRM.ItemCarteira(:D41, :C, :JM1, :onshore_clearing, :banking) => BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
