@@ -1,19 +1,55 @@
 
-struct FluxoVertice
-    cod_vertice::Symbol
+struct Vertice
     valor_alocado::Float64
     valor_mam::Float64
-    function FluxoVertice(cod_vertice::Symbol, valor_alocado::Float64, valor_mam::Float64)
-        @assert cod_vertice in VERTICES "vertice invalido: $cod_vertice"
+    function Vertice(valor_alocado::Float64, valor_mam::Float64)
         @assert valor_alocado > eps() "valor alocado deve ser maior que zero"
         @assert valor_mam > -eps()  "valor mam deve ser maior ou igual a zero"
-        valor_mam > eps() && @assert cod_vertice == Symbol("12") "apenas o vertice :12 pode ter valor MaM maior que zero"
-        new(cod_vertice, valor_alocado, valor_mam)
-    end
-    function FluxoVertice(cod_vertice::Int64, valor_alocado::Float64, valor_mam::Float64)
-        return FluxoVertice(get_codigo_vertice(cod_vertice), valor_alocado, valor_mam)
+        new(valor_alocado, valor_mam)
     end
 end
+
+function Base.:+(x::Vertice, y::Vertice)
+    return Vertice(x.valor_alocado + y.valor_alocado, x.valor_mam + y.valor_mam)
+end
+
+struct Fluxos
+    vertices::Dict{Symbol, Vertice}
+    function Fluxos(vertices::Dict{Symbol, Vertice})
+        for (codigo, vertice) in vertices
+            @assert codigo in VERTICES "vertice invalido: $codigo"
+            if codigo != get_codigo_vertice(12)
+                @assert vertice.valor_mam < eps() "apenas o vertice :12 pode ter valor MaM maior que zero"
+            end
+        end
+        new(vertices)
+    end
+    Fluxos() = Fluxos(Dict{Symbol, Vertice}())
+    function Fluxos(vertices::Dict{Int64, Vertice})
+        return Fluxos(Dict([get_codigo_vertice(k) => v for (k,v) in vertices]))
+    end
+end
+
+function Base.getindex(X::Fluxos, i::Symbol)::Vertice
+    return X.vertices[i]
+end
+function Base.setindex!(X::Fluxos, v::Vertice, i::Symbol)
+    if i != get_codigo_vertice(12)
+        @assert v.valor_mam < eps() "apenas o vertice :12 pode ter valor MaM maior que zero"
+    end
+    X.vertices[i] = v
+end
+
+function add_vertice!(fluxos::Fluxos, codigo_vertice::Symbol, vertice::Vertice)
+    if haskey(fluxos.vertices, codigo_vertice)
+        fluxos.vertices[codigo_vertice] += vertice
+    else
+        fluxos.vertices[codigo_vertice] = vertice
+    end
+end
+add_vertice!(fluxos::Fluxos, i::Int64, vertice::Vertice) = add_vertice!(fluxos, get_codigo_vertice(i), vertice)
+
+sorted_keys(fluxos::Fluxos) = sort(collect(keys(fluxos.vertices)))
 
 function get_codigo_vertice(v::Int64)::Symbol
     @assert v >= 1
@@ -34,14 +70,12 @@ struct ItemCarteira
     fator_risco::Symbol
     local_registro::SymbolOrNothing
     carteira_negoc::Symbol
-    fluxos::Vector{FluxoVertice}
     function ItemCarteira(
         item::Symbol,
         id_posicao::SymbolOrNothing,
         fator_risco::Symbol,
         local_registro::SymbolOrNothing,
-        carteira_negoc::Symbol,
-        fluxos::Vector{FluxoVertice})
+        carteira_negoc::Symbol)
 
         @assert item in CONTAS "item invalido: $item"
         id_posicao != nothing && @assert id_posicao in POSICOES "posicao invalida: $id_posicao"
@@ -49,7 +83,7 @@ struct ItemCarteira
         local_registro != nothing && @assert local_registro in LOCAIS_REGISTRO "local_registro invalido: $local_registro"
         @assert carteira_negoc in CARTEIRAS "carteira invalida: $carteira_negoc"
 
-        return new(item, id_posicao, fator_risco, local_registro, carteira_negoc, fluxos)
+        return new(item, id_posicao, fator_risco, local_registro, carteira_negoc)
     end
 end
 
@@ -61,11 +95,11 @@ struct Documento
     tipo_arq::Symbol
     nome_contato::String
     fone_contato::String
-    ativo::Vector{ItemCarteira}
-    passivo::Vector{ItemCarteira}
-    derivativo::Vector{ItemCarteira}
-    ativo_fundo::Vector{ItemCarteira}
-    atividade_financeira::Vector{ItemCarteira}
+    ativo::Dict{ItemCarteira, Fluxos}
+    passivo::Dict{ItemCarteira, Fluxos}
+    derivativo::Dict{ItemCarteira, Fluxos}
+    ativo_fundo::Dict{ItemCarteira, Fluxos}
+    atividade_financeira::Dict{ItemCarteira, Fluxos}
     function Documento(
         id_docto::String,
         id_docto_versao::String,
@@ -74,11 +108,11 @@ struct Documento
         tipo_arq::Symbol,
         nome_contato::String,
         fone_contato::String,
-        ativo::Vector{ItemCarteira},
-        passivo::Vector{ItemCarteira},
-        derivativo::Vector{ItemCarteira},
-        ativo_fundo::Vector{ItemCarteira},
-        atividade_financeira::Vector{ItemCarteira}
+        ativo::Dict{ItemCarteira, Fluxos},
+        passivo::Dict{ItemCarteira, Fluxos},
+        derivativo::Dict{ItemCarteira, Fluxos},
+        ativo_fundo::Dict{ItemCarteira, Fluxos},
+        atividade_financeira::Dict{ItemCarteira, Fluxos}
     )
 
         @assert id_docto in ["2060"] "id documento invalido: $id_docto"
@@ -88,27 +122,27 @@ struct Documento
         @assert nome_contato != "" "nome contato obrigatorio"
         @assert fone_contato != "" "telefone contato obrigatorio"
 
-        for ic in ativo
+        for ic in keys(ativo)
             @assert ic.item in CONTAS_ATIVO "conta de ativo invalida: $(ic.item)"
             @assert ic.id_posicao == nothing "$ic nao pode ter id_posicao"
             @assert ic.local_registro != nothing "$ic deve ter local_registro"
         end
-        for ic in passivo
+        for ic in keys(passivo)
             @assert ic.item in CONTAS_PASSIVO "conta de passivo invalida: $(ic.item)"
             @assert ic.id_posicao == nothing "$ic nao pode ter id_posicao"
             @assert ic.local_registro != nothing "$ic deve ter local_registro"
         end
-        for ic in derivativo
+        for ic in keys(derivativo)
             @assert ic.item in CONTAS_DERIVATIVO "conta de derivativo invalida: $(ic.item)"
             @assert ic.id_posicao != nothing "$ic deve ter id_posicao"
             @assert ic.local_registro != nothing "$ic deve ter local_registro"
         end
-        for ic in ativo_fundo
+        for ic in keys(ativo_fundo)
             @assert ic.item in CONTAS_ATIVO "conta de ativo de fundo invalida: $(ic.item)"
             @assert ic.id_posicao == nothing "$ic nao pode ter id_posicao"
             @assert ic.local_registro != nothing "$ic deve ter local_registro"
         end
-        for ic in atividade_financeira
+        for ic in keys(atividade_financeira)
             @assert ic.item in CONTAS_ATIVIDADE_FINANCEIRA "conta de atividade financeira invalida: $(ic.item)"
             @assert ic.id_posicao != nothing "$ic deve ter id_posicao"
             @assert ic.local_registro == nothing "$ic nao pode ter local_registro"
@@ -121,5 +155,25 @@ struct Documento
             ativo_fundo, atividade_financeira
         )
 
+    end
+    function Documento(
+        id_docto::String,
+        id_docto_versao::String,
+        data_base::String,
+        id_inst_financ::Int64,
+        tipo_arq::Symbol,
+        nome_contato::String,
+        fone_contato::String
+    )
+        return Documento(
+            id_docto, id_docto_versao, data_base, id_inst_financ,
+            tipo_arq, nome_contato, fone_contato,
+            # blank dicts
+            Dict{ItemCarteira, Fluxos}(),
+            Dict{ItemCarteira, Fluxos}(),
+            Dict{ItemCarteira, Fluxos}(),
+            Dict{ItemCarteira, Fluxos}(),
+            Dict{ItemCarteira, Fluxos}()
+        )
     end
 end

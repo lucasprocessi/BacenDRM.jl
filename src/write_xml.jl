@@ -12,34 +12,39 @@ function to_xml(doc::Documento)
     addelement!(drm, "FoneContato"  , doc.fone_contato)
 
     ativo = addelement!(drm, "Ativo")
-    for item in doc.ativo
-        _add_item_carteira!(ativo, item)
+    for item in sorted_keys(doc.ativo)
+        _add_item_carteira!(ativo, item, doc.ativo[item])
     end
 
     passivo = addelement!(drm, "Passivo")
-    for item in doc.passivo
-        _add_item_carteira!(passivo, item)
+    for item in sorted_keys(doc.passivo)
+        _add_item_carteira!(passivo, item, doc.passivo[item])
     end
 
     derivativo = addelement!(drm, "Derivativo")
-    for item in doc.derivativo
-        _add_item_carteira!(derivativo, item)
+    for item in sorted_keys(doc.derivativo)
+        _add_item_carteira!(derivativo, item, doc.derivativo[item])
     end
 
     ativo_fundo = addelement!(drm, "AtivoFundo")
-    for item in doc.ativo_fundo
-        _add_item_carteira!(ativo_fundo, item)
+    for item in sorted_keys(doc.ativo_fundo)
+        _add_item_carteira!(ativo_fundo, item, doc.ativo_fundo[item])
     end
 
     atividade_financeira = addelement!(drm, "AtividadeFinanceira")
-    for item in doc.atividade_financeira
-        _add_item_carteira!(atividade_financeira, item)
+    for item in sorted_keys(doc.atividade_financeira)
+        _add_item_carteira!(atividade_financeira, item, doc.atividade_financeira[item])
     end
 
     return xml
 end
 
-function _add_item_carteira!(node::EzXML.Node, item::ItemCarteira)
+function sorted_keys(d::Dict{ItemCarteira, Fluxos})
+    v_keys = sort(collect(keys(d)), by = x -> x.item)
+    return v_keys
+end
+
+function _add_item_carteira!(node::EzXML.Node, item::ItemCarteira, fluxos::Fluxos)
     node_item = addelement!(node, "ItemCarteira")
     # item::Symbol
     # id_posicao::SymbolOrNothing
@@ -56,17 +61,17 @@ function _add_item_carteira!(node::EzXML.Node, item::ItemCarteira)
         link!(node_item, AttributeNode("LocalRegistro", _encode_local_registro(item.local_registro)))
     end
     link!(node_item, AttributeNode("CarteiraNegoc", _encode_carteira_negoc(item.carteira_negoc)))
-    for fv in item.fluxos
-        _add_fluxo_vertice!(node_item, fv)
+    for codigo in sorted_keys(fluxos)
+        _add_fluxo_vertice!(node_item, codigo, fluxos[codigo])
     end
     return node
 end
 
-function _add_fluxo_vertice!(node::EzXML.Node, fv::FluxoVertice)
+function _add_fluxo_vertice!(node::EzXML.Node, codigo_vertice::Symbol, vertice::Vertice)
     node_fv = addelement!(node, "FluxoVertice")
-    link!(node_fv, AttributeNode("CodVertice", "$(fv.cod_vertice)"))
-    link!(node_fv, AttributeNode("ValorAlocado", "$(_trunc_to_thousands(fv.valor_alocado))"))
-    fv.valor_mam > eps() && link!(node_fv, AttributeNode("ValorMaM", "$(_trunc_to_thousands(fv.valor_mam))"))
+    link!(node_fv, AttributeNode("CodVertice", "$codigo_vertice"))
+    link!(node_fv, AttributeNode("ValorAlocado", "$(_trunc_to_thousands(vertice.valor_alocado))"))
+    vertice.valor_mam > eps() && link!(node_fv, AttributeNode("ValorMaM", "$(_trunc_to_thousands(vertice.valor_mam))"))
     return node
 end
 

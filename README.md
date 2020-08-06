@@ -5,59 +5,7 @@ Writes DRM (monthly market risk report) XML file, as required by Brazilian Centr
 ### Example
 
 ```julia
-ativo = [
-    BacenDRM.ItemCarteira(
-        :A20,             # item::Symbol
-        nothing,          # id_posicao::SymbolOrNothing
-        :JM1,             # fator_risco::Symbol
-        :offshore,        # local_registro::SymbolOrNothing
-        :banking,         # carteira_negoc::Symbol
-        [BacenDRM.FluxoVertice(
-            Symbol("01"), # cod_vertice::Symbol
-            100_000.0,    # valor_alocado::Float64
-            0_000.0       # valor_mam::Float64
-        )]
-    )
-    BacenDRM.ItemCarteira(
-        :A30, nothing, :ME1, :offshore, :banking,
-        [
-            # cod_vertice parameter can also be an Int64.
-            # a special constructor will convert to symbol
-            # appropriately
-            BacenDRM.FluxoVertice(3, 100_000.0, 0_000.0)
-            BacenDRM.FluxoVertice(12, 100_000.0, 10_000.0)
-        ]
-    )
-]
-
-passivo = [
-    BacenDRM.ItemCarteira(
-        :P30, nothing, :JM1, :onshore_sem_clearing, :trading,
-        [BacenDRM.FluxoVertice(Symbol("01"), 100_000.0, 0_000.0)]
-    )
-]
-
-derivativo = [
-    BacenDRM.ItemCarteira(
-        :D41, :C, :JM1, :onshore_clearing, :banking,
-        [BacenDRM.FluxoVertice(Symbol("01"), 100_000.0, 0_000.0)]
-    )
-]
-
-ativo_fundo = [
-    BacenDRM.ItemCarteira(
-        :A90, nothing, :JM1, :offshore, :banking,
-        [BacenDRM.FluxoVertice(Symbol("01"), 100_000.0, 0_000.0)]
-    )
-]
-
-atividade_financeira = [
-    BacenDRM.ItemCarteira(
-        :AFC, :V, :JM1, nothing, :banking,
-        [BacenDRM.FluxoVertice(Symbol("01"), 100_000.0, 0_000.0)]
-    )
-]
-
+# create document with basic info
 doc = BacenDRM.Documento(
     "2060",              # id_docto::String,
     "v1",                # id_docto_versao::String,
@@ -65,13 +13,33 @@ doc = BacenDRM.Documento(
     123456,              # id_inst_financ::Int64,
     :I,                  # tipo_arq::Symbol,
     "Fulano",            # nome_contato::String,
-    "555-1234",          # fone_contato::String,
-    ativo,               # ativo::Vector{ItemCarteira},
-    passivo,             # passivo::Vector{ItemCarteira},
-    derivativo,          # derivativo::Vector{ItemCarteira},
-    ativo_fundo,         # ativo_fundo::Vector{ItemCarteira},
-    atividade_financeira # atividade_financeira::Vector{ItemCarteira}
+    "555-1234",          # fone_contato::String
 )
+
+# create ItemCarteira
+item_carteira = BacenDRM.ItemCarteira(
+    :A20,
+    nothing,
+    :JM1,
+    :offshore,
+    :banking
+)
+
+# create Vertice
+codigo_vertice = 1
+vertice_1 = BacenDRM.Vertice(100_000.0, 0_000.0)
+
+# Add ItemCarteira to a section
+doc.ativo[item_carteira] = BacenDRM.Fluxos() # no vertices yet
+BacenDRM.add_vertice!(doc.ativo[item_carteira], codigo_vertice, vertice_1) # add Vertice
+
+# one-command form
+doc.ativo[BacenDRM.ItemCarteira(:A30, nothing, :ME1, :offshore, :banking)] = BacenDRM.Fluxos(Dict([3 => BacenDRM.Vertice(100_000.0, 0_000.0), 12 => BacenDRM.Vertice(100_000.0, 10_000.0)]))
+
+doc.passivo[BacenDRM.ItemCarteira(:P30, nothing, :JM1, :onshore_sem_clearing, :trading)] = BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
+doc.derivativo[BacenDRM.ItemCarteira(:D41, :C, :JM1, :onshore_clearing, :banking)]       = BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
+doc.ativo_fundo[BacenDRM.ItemCarteira(:A90, nothing, :JM1, :offshore, :banking)]         = BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
+doc.atividade_financeira[BacenDRM.ItemCarteira(:AFC, :V, :JM1, nothing, :banking)]       = BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
 
 # write a xml file ready to be sent to BACEN...
 BacenDRM.write_xml("DRM.xml", doc)
