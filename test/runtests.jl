@@ -107,17 +107,30 @@ end
 
     # repeat for each vertice
     codigo_vertice = 1
-    vertice_1 = BacenDRM.Vertice(100_000.0, 0_000.0)
+    vertice_1 = BacenDRM.Vertice(
+        100_000.0, # valor_alocado::Float64
+          0_000.0  # valor_mam::Float64
+    )
     BacenDRM.add_vertice!(fluxos, codigo_vertice, vertice_1) # add Vertice
     # end repeat
 
     # assign Fluxos to a document section, indexing by ItemCarteira
     doc.ativo[item_carteira] = fluxos
 
-    # one-command form
-    doc.ativo[BacenDRM.ItemCarteira(:A30, nothing, :ME1, :offshore, :banking)] = BacenDRM.Fluxos(Dict([3 => BacenDRM.Vertice(100_000.0, 0_000.0), 12 => BacenDRM.Vertice(100_000.0, 10_000.0)]))
+    # two vertices
+    fluxos = BacenDRM.Fluxos()
+    BacenDRM.add_vertice!(fluxos,  3, BacenDRM.Vertice(100_000.0,  0_000.0))
+    BacenDRM.add_vertice!(fluxos, 12, BacenDRM.Vertice(100_000.0, 10_000.0))
+    doc.ativo[BacenDRM.ItemCarteira(:A30, nothing, :ME1, :offshore, :banking)] = fluxos
 
-    doc.passivo[BacenDRM.ItemCarteira(:P30, nothing, :JM1, :onshore_sem_clearing, :trading)] = BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
+    # you can also build a vertice adding incrementally its values
+    fluxos = BacenDRM.Fluxos()
+    BacenDRM.add_vertice!(fluxos, 1, BacenDRM.Vertice(50_000.0, 0_000.0))
+    BacenDRM.add_vertice!(fluxos, 1, BacenDRM.Vertice(50_000.0, 0_000.0))
+    # will result in: Vertice(100_000.0, 0.0)
+    doc.passivo[BacenDRM.ItemCarteira(:P30, nothing, :JM1, :onshore_sem_clearing, :trading)] = fluxos
+
+    # one-command form
     doc.derivativo[BacenDRM.ItemCarteira(:D41, :C, :JM1, :onshore_clearing, :banking)]       = BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
     doc.ativo_fundo[BacenDRM.ItemCarteira(:A90, nothing, :JM1, :offshore, :banking)]         = BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
     doc.atividade_financeira[BacenDRM.ItemCarteira(:AFC, :V, :JM1, nothing, :banking)]       = BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
@@ -182,6 +195,7 @@ end
     """
 
     @test _is_equal(doc, str_xml)
+    @test fluxos[Symbol("01")].valor_alocado == 100_000.0
 
     #BacenDRM.write_xml(Base.stdout, doc) # debug
 
