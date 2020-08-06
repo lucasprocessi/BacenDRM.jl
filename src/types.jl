@@ -26,11 +26,11 @@ struct Fluxos
     end
     Fluxos() = Fluxos(Dict{Symbol, Vertice}())
     function Fluxos(vertices::Dict{Int64, Vertice})
-        d = Dict{Symbol, Vertice}()
+        out = Fluxos() # blank
         for (k,v) in vertices
-            d[get_codigo_vertice(k)] = v
+            out[get_codigo_vertice(k)] = v
         end
-        return Fluxos(d)
+        return out
     end
 end
 
