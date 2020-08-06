@@ -84,7 +84,7 @@ end
 
 @testset "Write XML" begin
 
-    # create document with basic info
+    # create document with basic information
     doc = BacenDRM.Documento(
         "2060",              # id_docto::String,
         "v1",                # id_docto_versao::String,
@@ -103,12 +103,16 @@ end
         :offshore,
         :banking
     )
-    # create Vertice
+    fluxos = BacenDRM.Fluxos() # no vertices yet
+
+    # repeat for each vertice
     codigo_vertice = 1
     vertice_1 = BacenDRM.Vertice(100_000.0, 0_000.0)
-    # Add ItemCarteira to a section
-    doc.ativo[item_carteira] = BacenDRM.Fluxos() # no vertices yet
-    BacenDRM.add_vertice!(doc.ativo[item_carteira], codigo_vertice, vertice_1) # add Vertice
+    BacenDRM.add_vertice!(fluxos, codigo_vertice, vertice_1) # add Vertice
+    # end repeat
+
+    # assign Fluxos to a document section, indexing by ItemCarteira
+    doc.ativo[item_carteira] = fluxos
 
     # one-command form
     doc.ativo[BacenDRM.ItemCarteira(:A30, nothing, :ME1, :offshore, :banking)] = BacenDRM.Fluxos(Dict([3 => BacenDRM.Vertice(100_000.0, 0_000.0), 12 => BacenDRM.Vertice(100_000.0, 10_000.0)]))

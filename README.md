@@ -24,14 +24,16 @@ item_carteira = BacenDRM.ItemCarteira(
     :offshore,
     :banking
 )
+fluxos = BacenDRM.Fluxos() # no vertices yet
 
-# create Vertice
+# repeat for each vertice
 codigo_vertice = 1
 vertice_1 = BacenDRM.Vertice(100_000.0, 0_000.0)
+BacenDRM.add_vertice!(fluxos, codigo_vertice, vertice_1) # add Vertice
+# end repeat
 
-# Add ItemCarteira to a section
-doc.ativo[item_carteira] = BacenDRM.Fluxos() # no vertices yet
-BacenDRM.add_vertice!(doc.ativo[item_carteira], codigo_vertice, vertice_1) # add Vertice
+# assign Fluxos to a document section, indexing by ItemCarteira
+doc.ativo[item_carteira] = fluxos
 
 # one-command form
 doc.ativo[BacenDRM.ItemCarteira(:A30, nothing, :ME1, :offshore, :banking)] = BacenDRM.Fluxos(Dict([3 => BacenDRM.Vertice(100_000.0, 0_000.0), 12 => BacenDRM.Vertice(100_000.0, 10_000.0)]))

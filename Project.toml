@@ -1,7 +1,7 @@
 name = "BacenDRM"
 uuid = "08be8b77-4441-403f-b806-be951d3eff05"
 authors = ["lucasprocessi <lucasprocessi@gmail.com>"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
