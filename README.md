@@ -5,7 +5,7 @@ Writes DRM (monthly market risk report) XML file, as required by Brazilian Centr
 ### Example
 
 ```julia
-# create document with basic info
+# create document with basic information
 doc = BacenDRM.Documento(
     "2060",              # id_docto::String,
     "v1",                # id_docto_versao::String,
