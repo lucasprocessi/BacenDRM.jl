@@ -2,12 +2,72 @@ using Test
 using EzXML
 using BacenDRM
 
+function document_example()
+    # create document with basic information
+    doc = BacenDRM.Documento(
+        "2060",              # id_docto::String,
+        "v1",                # id_docto_versao::String,
+        "2020-06",           # data_base::String,
+        123456,              # id_inst_financ::Int64,
+        :I,                  # tipo_arq::Symbol,
+        "Fulano",            # nome_contato::String,
+        "555-1234",          # fone_contato::String
+    )
+
+    # create ItemCarteira, which is an index to document data
+    item_carteira = BacenDRM.ItemCarteira(
+        :A20,
+        nothing,
+        :JM1,
+        :offshore,
+        :banking
+    )
+
+    # repeat for each vertice
+    codigo_vertice = 1
+    vertice_1 = BacenDRM.Vertice(
+        100_000.0, # valor_alocado::Float64
+          0.0      # valor_mam::Float64
+    )
+    push!(doc, item_carteira, codigo_vertice, vertice_1) # add Vertice
+    # end repeat
+
+    # two vertices
+    ic = BacenDRM.ItemCarteira(:A30, nothing, :ME1, :offshore, :banking)
+    push!(doc, ic,  3, BacenDRM.Vertice(100_000.0,  0.0))
+    push!(doc, ic, 12, BacenDRM.Vertice(200_000.0, 10_000.0))
+
+    # you can also build a vertice adding incrementally its values
+    ic = BacenDRM.ItemCarteira(:P30, nothing, :JM1, :onshore_sem_clearing, :trading)
+    push!(doc, ic, 1, BacenDRM.Vertice(70_000.0, 0.0))
+    push!(doc, ic, 1, BacenDRM.Vertice(230_000.0, 0.0))
+    # will result in: Vertice(300_000.0, 0.0)
+
+    # one-liner
+    push!(doc, BacenDRM.ItemCarteira(:D41, :C, :JM1, :onshore_clearing, :banking), 1, BacenDRM.Vertice(400_000.0, 0.0))
+
+    # hedge fund assets: data goes into ativo_fundo section
+    ic = BacenDRM.ItemCarteira(
+        :A90,
+        nothing,
+        :JM1,
+        :offshore,
+        :banking,
+        true      # is_ativo_fundo::Bool=false
+    )
+    push!(doc, ic, 1, BacenDRM.Vertice(500_000.0, 0.0))
+
+    # atividade_financeira
+    push!(doc, BacenDRM.ItemCarteira(:AFC, :V, :JM1, nothing, :banking), 1, BacenDRM.Vertice(600_000.0, 0.0))
+
+    return doc
+end
 
 @testset "Vertice" begin
 
-    v1 = BacenDRM.Vertice(100_000.0, 0_000.0)
+    v1 = BacenDRM.Vertice(100_000.0, 0.0)
     @test v1.valor_alocado == 100_000.0
-    @test v1.valor_mam == 0_000.0
+    @test v1.valor_mam == 0.0
 
     v12 = BacenDRM.Vertice(200_000.0, 20_000.0)
     @test v12.valor_alocado == 200_000.0
@@ -26,41 +86,31 @@ end
     )
 
     @test ic.item == :A20
+    @test BacenDRM.is_ativo(ic)
+    @test !BacenDRM.is_passivo(ic)
+    @test !BacenDRM.is_derivativo(ic)
+    @test !BacenDRM.is_ativo_fundo(ic)
+    @test !BacenDRM.is_atividade_financeira(ic)
 
     ic2 = BacenDRM.ItemCarteira(
         :D41,              # item::Symbol
         :C,                # id_posicao::SymbolOrNothing
         :JM1,              # fator_risco::Symbol
         :onshore_clearing, # local_registro::SymbolOrNothing
-        :trading          # carteira_negoc::Symbol
+        :trading,          # carteira_negoc::Symbol
+        true               # is_ativo_fundo::Bool=false
     )
 
     @test ic2.fator_risco == :JM1
+    @test BacenDRM.is_ativo_fundo(ic2)
+    @test !BacenDRM.is_ativo(ic2)
+    @test !BacenDRM.is_passivo(ic2)
+    @test !BacenDRM.is_derivativo(ic2)
+    @test !BacenDRM.is_atividade_financeira(ic2)
 
 end
 
 @testset "Documento" begin
-
-    ativo = Dict([
-        BacenDRM.ItemCarteira(:A20, nothing, :JM1, :offshore, :banking) => BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
-        BacenDRM.ItemCarteira(:A30, nothing, :ME1, :offshore, :banking) =>
-        BacenDRM.Fluxos(Dict([
-            3 => BacenDRM.Vertice(100_000.0, 0_000.0)
-            12 => BacenDRM.Vertice(100_000.0, 10_000.0)
-        ]))
-    ])
-    passivo = Dict([
-        BacenDRM.ItemCarteira(:P30, nothing, :JM1, :onshore_sem_clearing, :trading) => BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
-    ])
-    derivativo = Dict([
-        BacenDRM.ItemCarteira(:D41, :C, :JM1, :onshore_clearing, :banking) => BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
-    ])
-    ativo_fundo = Dict([
-        BacenDRM.ItemCarteira(:A90, nothing, :JM1, :offshore, :banking) => BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
-    ])
-    atividade_financeira = Dict([
-        BacenDRM.ItemCarteira(:AFC, :V, :JM1, nothing, :banking) => BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
-    ])
 
     doc = BacenDRM.Documento(
         "2060",              # id_docto::String,
@@ -69,71 +119,37 @@ end
         123456,              # id_inst_financ::Int64,
         :I,                  # tipo_arq::Symbol,
         "Fulano",            # nome_contato::String,
-        "555-1234",          # fone_contato::String,
-        ativo,               # ativo::Vector{ItemCarteira},
-        passivo,             # passivo::Vector{ItemCarteira},
-        derivativo,          # derivativo::Vector{ItemCarteira},
-        ativo_fundo,         # ativo_fundo::Vector{ItemCarteira},
-        atividade_financeira # atividade_financeira::Vector{ItemCarteira}
+        "555-1234"           # fone_contato::String,
     )
+
+
+    # ativo :A20
+    ic = BacenDRM.ItemCarteira(:A20, nothing, :JM1, :offshore, :banking)
+    push!(doc, ic, 1, BacenDRM.Vertice(100_000.0, 0.0))
+    # ativo :A30
+    ic = BacenDRM.ItemCarteira(:A30, nothing, :ME1, :offshore, :banking)
+    push!(doc, ic,            3, BacenDRM.Vertice(100_000.0, 0.0))  # integer
+    push!(doc, ic, Symbol("12"), BacenDRM.Vertice(100_000.0, 10_000.0)) # or symbol
+
+    # passivo
+    push!(doc, BacenDRM.ItemCarteira(:P30, nothing, :JM1, :onshore_sem_clearing, :trading), 1, BacenDRM.Vertice(100_000.0, 0.0))
+    # derivativo
+    push!(doc, BacenDRM.ItemCarteira(:D41, :C, :JM1, :onshore_clearing, :banking), 1, BacenDRM.Vertice(100_000.0, 0.0))
+    # ativo_fundo
+    ic = BacenDRM.ItemCarteira(:A90, nothing, :JM1, :offshore, :banking, true) # is_ativo_fundo=true
+    push!(doc, ic, 1, BacenDRM.Vertice(100_000.0, 0.0))
+    # atividade_financeira
+    push!(doc, BacenDRM.ItemCarteira(:AFC, :V, :JM1, nothing, :banking), 1, BacenDRM.Vertice(100_000.0, 0.0))
 
     @test doc.id_docto == "2060"
     @test length(doc.ativo) == 2
 
 end
 
+
 @testset "Write XML" begin
 
-    # create document with basic information
-    doc = BacenDRM.Documento(
-        "2060",              # id_docto::String,
-        "v1",                # id_docto_versao::String,
-        "2020-06",           # data_base::String,
-        123456,              # id_inst_financ::Int64,
-        :I,                  # tipo_arq::Symbol,
-        "Fulano",            # nome_contato::String,
-        "555-1234",          # fone_contato::String
-    )
-
-    # create ItemCarteira
-    item_carteira = BacenDRM.ItemCarteira(
-        :A20,
-        nothing,
-        :JM1,
-        :offshore,
-        :banking
-    )
-    fluxos = BacenDRM.Fluxos() # no vertices yet
-
-    # repeat for each vertice
-    codigo_vertice = 1
-    vertice_1 = BacenDRM.Vertice(
-        100_000.0, # valor_alocado::Float64
-          0_000.0  # valor_mam::Float64
-    )
-    BacenDRM.add_vertice!(fluxos, codigo_vertice, vertice_1) # add Vertice
-    # end repeat
-
-    # assign Fluxos to a document section, indexing by ItemCarteira
-    doc.ativo[item_carteira] = fluxos
-
-    # two vertices
-    fluxos = BacenDRM.Fluxos()
-    BacenDRM.add_vertice!(fluxos,  3, BacenDRM.Vertice(100_000.0,  0_000.0))
-    BacenDRM.add_vertice!(fluxos, 12, BacenDRM.Vertice(100_000.0, 10_000.0))
-    doc.ativo[BacenDRM.ItemCarteira(:A30, nothing, :ME1, :offshore, :banking)] = fluxos
-
-    # you can also build a vertice adding incrementally its values
-    fluxos = BacenDRM.Fluxos()
-    BacenDRM.add_vertice!(fluxos, 1, BacenDRM.Vertice(50_000.0, 0_000.0))
-    BacenDRM.add_vertice!(fluxos, 1, BacenDRM.Vertice(50_000.0, 0_000.0))
-    # will result in: Vertice(100_000.0, 0.0)
-    doc.passivo[BacenDRM.ItemCarteira(:P30, nothing, :JM1, :onshore_sem_clearing, :trading)] = fluxos
-
-    # one-command form
-    doc.derivativo[BacenDRM.ItemCarteira(:D41, :C, :JM1, :onshore_clearing, :banking)]       = BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
-    doc.ativo_fundo[BacenDRM.ItemCarteira(:A90, nothing, :JM1, :offshore, :banking)]         = BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
-    doc.atividade_financeira[BacenDRM.ItemCarteira(:AFC, :V, :JM1, nothing, :banking)]       = BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
+    doc = document_example()
 
     function _is_equal(doc::BacenDRM.Documento, str_xml::String)
         b = IOBuffer()
@@ -168,34 +184,36 @@ end
         </ItemCarteira>
         <ItemCarteira Item="A30" FatorRisco="ME1" LocalRegistro="03" CarteiraNegoc="02">
           <FluxoVertice CodVertice="03" ValorAlocado="100"/>
-          <FluxoVertice CodVertice="12" ValorAlocado="100" ValorMaM="10"/>
+          <FluxoVertice CodVertice="12" ValorAlocado="200" ValorMaM="10"/>
         </ItemCarteira>
       </Ativo>
       <Passivo>
         <ItemCarteira Item="P30" FatorRisco="JM1" LocalRegistro="02" CarteiraNegoc="01">
-          <FluxoVertice CodVertice="01" ValorAlocado="100"/>
+          <FluxoVertice CodVertice="01" ValorAlocado="300"/>
         </ItemCarteira>
       </Passivo>
       <Derivativo>
         <ItemCarteira Item="D41" IdPosicao="C" FatorRisco="JM1" LocalRegistro="01" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="01" ValorAlocado="100"/>
+          <FluxoVertice CodVertice="01" ValorAlocado="400"/>
         </ItemCarteira>
       </Derivativo>
       <AtivoFundo>
         <ItemCarteira Item="A90" FatorRisco="JM1" LocalRegistro="03" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="01" ValorAlocado="100"/>
+          <FluxoVertice CodVertice="01" ValorAlocado="500"/>
         </ItemCarteira>
       </AtivoFundo>
       <AtividadeFinanceira>
         <ItemCarteira Item="AFC" IdPosicao="V" FatorRisco="JM1" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="01" ValorAlocado="100"/>
+          <FluxoVertice CodVertice="01" ValorAlocado="600"/>
         </ItemCarteira>
       </AtividadeFinanceira>
     </DocDRM>
     """
 
     @test _is_equal(doc, str_xml)
-    @test fluxos[Symbol("01")].valor_alocado == 100_000.0
+
+    ic = BacenDRM.ItemCarteira(:P30, nothing, :JM1, :onshore_sem_clearing, :trading)
+    @test doc.passivo[ic][Symbol("01")].valor_alocado == 300_000.0
 
     #BacenDRM.write_xml(Base.stdout, doc) # debug
 
@@ -206,37 +224,8 @@ end
 end
 
 @testset "Write CSV" begin
-    ativo = Dict([
-        BacenDRM.ItemCarteira(:A20, nothing, :JM1, :offshore, :banking) => BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
-        BacenDRM.ItemCarteira(:A30, nothing, :ME1, :offshore, :banking) => BacenDRM.Fluxos(Dict([3 => BacenDRM.Vertice(100_000.0, 0_000.0), 12 => BacenDRM.Vertice(100_000.0, 10_000.0)]))
-    ])
-    passivo = Dict([
-        BacenDRM.ItemCarteira(:P30, nothing, :JM1, :onshore_sem_clearing, :trading) => BacenDRM.Fluxos(Dict([Symbol("01") => BacenDRM.Vertice(100_000.0, 0_000.0)]))
-    ])
-    derivativo = Dict([
-        BacenDRM.ItemCarteira(:D41, :C, :JM1, :onshore_clearing, :banking) => BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
-    ])
-    ativo_fundo = Dict([
-        BacenDRM.ItemCarteira(:A90, nothing, :JM1, :offshore, :banking) => BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
-    ])
-    atividade_financeira = Dict([
-        BacenDRM.ItemCarteira(:AFC, :V, :JM1, nothing, :banking) => BacenDRM.Fluxos(Dict([1 => BacenDRM.Vertice(100_000.0, 0_000.0)]))
-    ])
 
-    doc = BacenDRM.Documento(
-        "2060",              # id_docto::String,
-        "v1",                # id_docto_versao::String,
-        "2020-06",           # data_base::String,
-        123456,              # id_inst_financ::Int64,
-        :I,                  # tipo_arq::Symbol,
-        "Fulano",            # nome_contato::String,
-        "555-1234",          # fone_contato::String,
-        ativo,               # ativo::Dict{ItemCarteira, Fluxos},
-        passivo,             # passivo::Dict{ItemCarteira, Fluxos},
-        derivativo,          # derivativo::Dict{ItemCarteira, Fluxos},
-        ativo_fundo,         # ativo_fundo::Dict{ItemCarteira, Fluxos},
-        atividade_financeira # atividade_financeira::Dict{ItemCarteira, Fluxos}
-    )
+    doc = document_example()
 
     #BacenDRM.write_csv(Base.stdout, doc) # debug
     #BacenDRM.write_csv("drm.csv", doc)   # debug
