@@ -80,7 +80,7 @@ end
     fluxo = BacenDRM.Fluxos()
     fluxo[1] = BacenDRM.Vertice(10_000.0, 0.0)
 
-    @test fluxo[Symbol("01")].valor_alocado == 10_000.0
+    @test fluxo[1].valor_alocado == 10_000.0
     @test fluxo[Symbol("01")].valor_mam == 0.0
 
     fluxo[Symbol("12")] = BacenDRM.Vertice(10.0, 20.0)
