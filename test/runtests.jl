@@ -75,6 +75,26 @@ end
 
 end
 
+@testset "Fluxo" begin
+
+    fluxo = BacenDRM.Fluxos()
+    fluxo[1] = BacenDRM.Vertice(10_000.0, 0.0)
+
+    @test fluxo[Symbol("01")].valor_alocado == 10_000.0
+    @test fluxo[Symbol("01")].valor_mam == 0.0
+
+    fluxo[Symbol("12")] = BacenDRM.Vertice(10.0, 20.0)
+
+
+    @test_throws AssertionError fluxo[2]  = BacenDRM.Vertice(0.0, 1_000.0) # invalid valor_mam
+    @test_throws AssertionError fluxo[Symbol("3")]  = BacenDRM.Vertice(0.0, 1_000.0) # invalid valor_mam
+    @test_throws AssertionError fluxo[13] = BacenDRM.Vertice(0.0, 1_000.0) # invalid codigo_vertice
+    @test_throws AssertionError fluxo[Symbol("14")] = BacenDRM.Vertice(0.0, 1_000.0) # invalid codigo_vertice
+
+end
+
+
+
 @testset "Item Carteira" begin
 
     ic = BacenDRM.ItemCarteira(

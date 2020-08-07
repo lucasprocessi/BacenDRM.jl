@@ -15,40 +15,27 @@ end
 
 struct Fluxos
     vertices::Dict{Symbol, Vertice}
-    function Fluxos(vertices::Dict{Symbol, Vertice})
-        for (codigo, vertice) in vertices
-            @assert codigo in VERTICES "vertice invalido: $codigo"
-            if codigo != get_codigo_vertice(12)
-                @assert vertice.valor_mam < eps() "apenas o vertice :12 pode ter valor MaM maior que zero"
-            end
-        end
-        new(vertices)
-    end
-    Fluxos() = Fluxos(Dict{Symbol, Vertice}())
-    function Fluxos(vertices::Dict{Int64, Vertice})
-        out = Fluxos() # blank
-        for (k,v) in vertices
-            out[get_codigo_vertice(k)] = v
-        end
-        return out
-    end
+    Fluxos() = new(Dict{Symbol, Vertice}())
 end
 
 function Base.getindex(X::Fluxos, i::Symbol)::Vertice
     return X.vertices[i]
 end
+Base.getindex(X::Fluxos, i::Int64)::Vertice = X[get_codigo_vertice(i)]
+
 function Base.setindex!(X::Fluxos, v::Vertice, i::Symbol)
     if i != get_codigo_vertice(12)
         @assert v.valor_mam < eps() "apenas o vertice :12 pode ter valor MaM maior que zero"
     end
     X.vertices[i] = v
 end
+Base.setindex!(X::Fluxos, v::Vertice, i::Int64) = X[get_codigo_vertice(i)] = v
 
 function add_vertice!(fluxos::Fluxos, codigo_vertice::Symbol, vertice::Vertice)
     if haskey(fluxos.vertices, codigo_vertice)
-        fluxos.vertices[codigo_vertice] += vertice
+        fluxos[codigo_vertice] += vertice
     else
-        fluxos.vertices[codigo_vertice] = vertice
+        fluxos[codigo_vertice] = vertice
     end
 end
 add_vertice!(fluxos::Fluxos, i::Int64, vertice::Vertice) = add_vertice!(fluxos, get_codigo_vertice(i), vertice)
