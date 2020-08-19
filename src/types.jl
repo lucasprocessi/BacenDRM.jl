@@ -3,7 +3,7 @@ struct Vertice
     valor_alocado::Float64
     valor_mam::Float64
     function Vertice(valor_alocado::Float64, valor_mam::Float64)
-        @assert valor_alocado > eps() "valor alocado deve ser maior que zero"
+        @assert valor_alocado > -eps() "valor alocado deve ser maior ou igual a zero"
         @assert valor_mam > -eps()  "valor mam deve ser maior ou igual a zero"
         new(valor_alocado, valor_mam)
     end
