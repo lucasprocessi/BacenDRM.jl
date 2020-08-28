@@ -61,30 +61,35 @@ struct ItemCarteira
     fator_risco::Symbol
     local_registro::SymbolOrNothing
     carteira_negoc::Symbol
-    is_ativo_fundo::Bool
+    is_abertura_fundo::Bool
     function ItemCarteira(
         item::Symbol,
         id_posicao::SymbolOrNothing,
         fator_risco::Symbol,
         local_registro::SymbolOrNothing,
         carteira_negoc::Symbol,
-        is_ativo_fundo::Bool=false)
+        is_abertura_fundo::Bool=false)
 
         @assert item in CONTAS "item invalido: $item"
         id_posicao != nothing && @assert id_posicao in POSICOES "posicao invalida: $id_posicao"
         @assert fator_risco in FATORES_RISCO "fator de risco invalido: $fator_risco"
         local_registro != nothing && @assert local_registro in LOCAIS_REGISTRO "local_registro invalido: $local_registro"
         @assert carteira_negoc in CARTEIRAS "carteira invalida: $carteira_negoc"
-        is_ativo_fundo && @assert !(item in CONTAS_ATIVIDADE_FINANCEIRA) "ativo fundo invalido: $item"
+        is_abertura_fundo && @assert item in CONTAS "item fundo invalido: $item"
 
-        return new(item, id_posicao, fator_risco, local_registro, carteira_negoc, is_ativo_fundo)
+        return new(item, id_posicao, fator_risco, local_registro, carteira_negoc, is_abertura_fundo)
     end
 end
 
-is_ativo_fundo(item::ItemCarteira)::Bool          = item.is_ativo_fundo
-is_ativo(item::ItemCarteira)::Bool                = !is_ativo_fundo(item) && (item.item in CONTAS_ATIVO)
-is_passivo(item::ItemCarteira)::Bool              = !is_ativo_fundo(item) && (item.item in CONTAS_PASSIVO)
-is_derivativo(item::ItemCarteira)::Bool           = !is_ativo_fundo(item) && (item.item in CONTAS_DERIVATIVO)
+is_ativo(item::ItemCarteira)::Bool                = !item.is_abertura_fundo && (item.item in CONTAS_ATIVO)
+is_ativo_fundo(item::ItemCarteira)::Bool          = item.is_abertura_fundo && (item.item in CONTAS_ATIVO)
+
+is_passivo(item::ItemCarteira)::Bool              = !item.is_abertura_fundo && (item.item in CONTAS_PASSIVO)
+is_passivo_fundo(item::ItemCarteira)::Bool        = item.is_abertura_fundo && (item.item in CONTAS_PASSIVO)
+
+is_derivativo(item::ItemCarteira)::Bool           = !item.is_abertura_fundo && (item.item in CONTAS_DERIVATIVO)
+is_derivativo_fundo(item::ItemCarteira)::Bool     = item.is_abertura_fundo && (item.item in CONTAS_DERIVATIVO)
+
 is_atividade_financeira(item::ItemCarteira)::Bool = item.item in CONTAS_ATIVIDADE_FINANCEIRA
 
 struct Documento
@@ -99,6 +104,8 @@ struct Documento
     passivo::Dict{ItemCarteira, Fluxos}                 # internal
     derivativo::Dict{ItemCarteira, Fluxos}              # internal
     ativo_fundo::Dict{ItemCarteira, Fluxos}             # internal
+    passivo_fundo::Dict{ItemCarteira, Fluxos}           # internal
+    derivativo_fundo::Dict{ItemCarteira, Fluxos}        # internal
     atividade_financeira::Dict{ItemCarteira, Fluxos}    # internal
 
     function Documento(
@@ -124,6 +131,8 @@ struct Documento
             Dict{ItemCarteira, Fluxos}(),
             Dict{ItemCarteira, Fluxos}(),
             Dict{ItemCarteira, Fluxos}(),
+            Dict{ItemCarteira, Fluxos}(),
+            Dict{ItemCarteira, Fluxos}(),
             Dict{ItemCarteira, Fluxos}()
         )
     end
@@ -145,12 +154,16 @@ end
 function _infer_document_section(doc::Documento, item_carteira::ItemCarteira)
     if is_ativo(item_carteira)
         return doc.ativo
-    elseif is_passivo(item_carteira)
-        return doc.passivo
-    elseif is_derivativo(item_carteira)
-        return doc.derivativo
     elseif is_ativo_fundo(item_carteira)
         return doc.ativo_fundo
+    elseif is_passivo(item_carteira)
+        return doc.passivo
+    elseif is_passivo_fundo(item_carteira)
+        return doc.passivo_fundo
+    elseif is_derivativo(item_carteira)
+        return doc.derivativo
+    elseif is_derivativo_fundo(item_carteira)
+        return doc.derivativo_fundo
     elseif is_atividade_financeira(item_carteira)
         return doc.atividade_financeira
     else

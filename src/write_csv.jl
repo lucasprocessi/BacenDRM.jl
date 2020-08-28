@@ -55,6 +55,12 @@ function write_csv(io::IO, doc::Documento)
     for item_carteira in sorted_keys(doc.ativo_fundo)
         _write_csv_item_carteira(io, item_carteira, doc.ativo_fundo[item_carteira], "ativo_fundo")
     end
+    for item_carteira in sorted_keys(doc.passivo_fundo)
+        _write_csv_item_carteira(io, item_carteira, doc.passivo_fundo[item_carteira], "passivo_fundo")
+    end
+    for item_carteira in sorted_keys(doc.derivativo_fundo)
+        _write_csv_item_carteira(io, item_carteira, doc.derivativo_fundo[item_carteira], "derivativo_fundo")
+    end
     for item_carteira in sorted_keys(doc.atividade_financeira)
         _write_csv_item_carteira(io, item_carteira, doc.atividade_financeira[item_carteira], "atividade_financeira")
     end

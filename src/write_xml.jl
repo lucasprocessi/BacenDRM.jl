@@ -31,6 +31,16 @@ function to_xml(doc::Documento)
         _add_item_carteira!(ativo_fundo, item, doc.ativo_fundo[item])
     end
 
+    passivo_fundo = addelement!(drm, "PassivoFundo")
+    for item in sorted_keys(doc.passivo_fundo)
+        _add_item_carteira!(passivo_fundo, item, doc.passivo_fundo[item])
+    end
+
+    derivativo_fundo = addelement!(drm, "DerivativoFundo")
+    for item in sorted_keys(doc.derivativo_fundo)
+        _add_item_carteira!(derivativo_fundo, item, doc.derivativo_fundo[item])
+    end
+
     atividade_financeira = addelement!(drm, "AtividadeFinanceira")
     for item in sorted_keys(doc.atividade_financeira)
         _add_item_carteira!(atividade_financeira, item, doc.atividade_financeira[item])

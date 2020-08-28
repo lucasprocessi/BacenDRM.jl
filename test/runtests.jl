@@ -110,6 +110,8 @@ end
     @test !BacenDRM.is_passivo(ic)
     @test !BacenDRM.is_derivativo(ic)
     @test !BacenDRM.is_ativo_fundo(ic)
+    @test !BacenDRM.is_passivo_fundo(ic)
+    @test !BacenDRM.is_derivativo_fundo(ic)
     @test !BacenDRM.is_atividade_financeira(ic)
 
     ic2 = BacenDRM.ItemCarteira(
@@ -118,11 +120,13 @@ end
         :JM1,              # fator_risco::Symbol
         :onshore_clearing, # local_registro::SymbolOrNothing
         :trading,          # carteira_negoc::Symbol
-        true               # is_ativo_fundo::Bool=false
+        true               # is_abertura_fundo::Bool=false
     )
 
     @test ic2.fator_risco == :JM1
-    @test BacenDRM.is_ativo_fundo(ic2)
+    @test !BacenDRM.is_ativo_fundo(ic2)
+    @test !BacenDRM.is_passivo_fundo(ic2)
+    @test BacenDRM.is_derivativo_fundo(ic2)
     @test !BacenDRM.is_ativo(ic2)
     @test !BacenDRM.is_passivo(ic2)
     @test !BacenDRM.is_derivativo(ic2)
@@ -156,7 +160,7 @@ end
     # derivativo
     push!(doc, BacenDRM.ItemCarteira(:D41, :C, :JM1, :onshore_clearing, :banking), 1, BacenDRM.Vertice(100_000.0, 0.0))
     # ativo_fundo
-    ic = BacenDRM.ItemCarteira(:A90, nothing, :JM1, :offshore, :banking, true) # is_ativo_fundo=true
+    ic = BacenDRM.ItemCarteira(:A90, nothing, :JM1, :offshore, :banking, true) # is_abertura_fundo=true
     push!(doc, ic, 1, BacenDRM.Vertice(100_000.0, 0.0))
     # atividade_financeira
     push!(doc, BacenDRM.ItemCarteira(:AFC, :V, :JM1, nothing, :banking), 1, BacenDRM.Vertice(100_000.0, 0.0))
@@ -222,6 +226,8 @@ end
           <FluxoVertice CodVertice="01" ValorAlocado="500"/>
         </ItemCarteira>
       </AtivoFundo>
+      <PassivoFundo/>
+      <DerivativoFundo/>
       <AtividadeFinanceira>
         <ItemCarteira Item="AFC" IdPosicao="V" FatorRisco="JM1" CarteiraNegoc="02">
           <FluxoVertice CodVertice="01" ValorAlocado="600"/>
