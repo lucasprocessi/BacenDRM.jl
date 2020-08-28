@@ -56,6 +56,8 @@ function document_example()
         true      # is_ativo_fundo::Bool=false
     )
     push!(doc, ic, 1, BacenDRM.Vertice(500_000.0, 0.0))
+    push!(doc, BacenDRM.ItemCarteira(:P10, nothing, :JI1, :offshore, :trading, true), 1, BacenDRM.Vertice(700_000.0, 0.0))
+    push!(doc, BacenDRM.ItemCarteira(:D20, nothing, :ME3, :offshore, :trading, true), 1, BacenDRM.Vertice(800_000.0, 0.0))
 
     # atividade_financeira
     push!(doc, BacenDRM.ItemCarteira(:AFC, :V, :JM1, nothing, :banking), 1, BacenDRM.Vertice(600_000.0, 0.0))
@@ -193,45 +195,55 @@ end
     end
 
     str_xml = """
-    <?xml version="1.0" encoding="UTF-8"?>
-    <DocDRM>
-      <IdDocto>2060</IdDocto>
-      <IdDoctoVersao>v1</IdDoctoVersao>
-      <DataBase>2020-06</DataBase>
-      <IdInstFinanc>123456</IdInstFinanc>
-      <TipoArq>I</TipoArq>
-      <NomeContato>Fulano</NomeContato>
-      <FoneContato>555-1234</FoneContato>
-      <Ativo>
-        <ItemCarteira Item="A20" FatorRisco="JM1" LocalRegistro="03" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="01" ValorAlocado="100"/>
-        </ItemCarteira>
-        <ItemCarteira Item="A30" FatorRisco="ME1" LocalRegistro="03" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="03" ValorAlocado="100"/>
-          <FluxoVertice CodVertice="12" ValorAlocado="200" ValorMaM="10"/>
-        </ItemCarteira>
-      </Ativo>
-      <Passivo>
-        <ItemCarteira Item="P30" FatorRisco="JM1" LocalRegistro="02" CarteiraNegoc="01">
-          <FluxoVertice CodVertice="01" ValorAlocado="300"/>
-        </ItemCarteira>
-      </Passivo>
-      <Derivativo>
-        <ItemCarteira Item="D41" IdPosicao="C" FatorRisco="JM1" LocalRegistro="01" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="01" ValorAlocado="400"/>
-        </ItemCarteira>
-      </Derivativo>
-      <AtivoFundo>
-        <ItemCarteira Item="A90" FatorRisco="JM1" LocalRegistro="03" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="01" ValorAlocado="500"/>
-        </ItemCarteira>
-      </AtivoFundo>
-      <AtividadeFinanceira>
-        <ItemCarteira Item="AFC" IdPosicao="V" FatorRisco="JM1" CarteiraNegoc="02">
-          <FluxoVertice CodVertice="01" ValorAlocado="600"/>
-        </ItemCarteira>
-      </AtividadeFinanceira>
-    </DocDRM>
+<?xml version="1.0" encoding="UTF-8"?>
+<DocDRM>
+  <IdDocto>2060</IdDocto>
+  <IdDoctoVersao>v1</IdDoctoVersao>
+  <DataBase>2020-06</DataBase>
+  <IdInstFinanc>123456</IdInstFinanc>
+  <TipoArq>I</TipoArq>
+  <NomeContato>Fulano</NomeContato>
+  <FoneContato>555-1234</FoneContato>
+  <Ativo>
+    <ItemCarteira Item="A20" FatorRisco="JM1" LocalRegistro="03" CarteiraNegoc="02">
+      <FluxoVertice CodVertice="01" ValorAlocado="100"/>
+    </ItemCarteira>
+    <ItemCarteira Item="A30" FatorRisco="ME1" LocalRegistro="03" CarteiraNegoc="02">
+      <FluxoVertice CodVertice="03" ValorAlocado="100"/>
+      <FluxoVertice CodVertice="12" ValorAlocado="200" ValorMaM="10"/>
+    </ItemCarteira>
+  </Ativo>
+  <Passivo>
+    <ItemCarteira Item="P30" FatorRisco="JM1" LocalRegistro="02" CarteiraNegoc="01">
+      <FluxoVertice CodVertice="01" ValorAlocado="300"/>
+    </ItemCarteira>
+  </Passivo>
+  <Derivativo>
+    <ItemCarteira Item="D41" IdPosicao="C" FatorRisco="JM1" LocalRegistro="01" CarteiraNegoc="02">
+      <FluxoVertice CodVertice="01" ValorAlocado="400"/>
+    </ItemCarteira>
+  </Derivativo>
+  <AtivoFundo>
+    <ItemCarteira Item="A90" FatorRisco="JM1" LocalRegistro="03" CarteiraNegoc="02">
+      <FluxoVertice CodVertice="01" ValorAlocado="500"/>
+    </ItemCarteira>
+  </AtivoFundo>
+  <PassivoFundo>
+    <ItemCarteira Item="P10" FatorRisco="JI1" LocalRegistro="03" CarteiraNegoc="01">
+      <FluxoVertice CodVertice="01" ValorAlocado="700"/>
+    </ItemCarteira>
+  </PassivoFundo>
+  <DerivativoFundo>
+    <ItemCarteira Item="D20" FatorRisco="ME3" LocalRegistro="03" CarteiraNegoc="01">
+      <FluxoVertice CodVertice="01" ValorAlocado="800"/>
+    </ItemCarteira>
+  </DerivativoFundo>
+  <AtividadeFinanceira>
+    <ItemCarteira Item="AFC" IdPosicao="V" FatorRisco="JM1" CarteiraNegoc="02">
+      <FluxoVertice CodVertice="01" ValorAlocado="600"/>
+    </ItemCarteira>
+  </AtividadeFinanceira>
+</DocDRM>
     """
 
     @test _is_equal(doc, str_xml)
