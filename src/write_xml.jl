@@ -11,39 +11,53 @@ function to_xml(doc::Documento)
     addelement!(drm, "NomeContato"  , doc.nome_contato)
     addelement!(drm, "FoneContato"  , doc.fone_contato)
 
-    ativo = addelement!(drm, "Ativo")
-    for item in sorted_keys(doc.ativo)
-        _add_item_carteira!(ativo, item, doc.ativo[item])
+    if length(doc.ativo) > 0
+        ativo = addelement!(drm, "Ativo")
+        for item in sorted_keys(doc.ativo)
+            _add_item_carteira!(ativo, item, doc.ativo[item])
+        end
     end
 
-    passivo = addelement!(drm, "Passivo")
-    for item in sorted_keys(doc.passivo)
-        _add_item_carteira!(passivo, item, doc.passivo[item])
+    if length(doc.passivo) > 0
+        passivo = addelement!(drm, "Passivo")
+        for item in sorted_keys(doc.passivo)
+            _add_item_carteira!(passivo, item, doc.passivo[item])
+        end
     end
 
-    derivativo = addelement!(drm, "Derivativo")
-    for item in sorted_keys(doc.derivativo)
-        _add_item_carteira!(derivativo, item, doc.derivativo[item])
+    if length(doc.derivativo) > 0
+        derivativo = addelement!(drm, "Derivativo")
+        for item in sorted_keys(doc.derivativo)
+            _add_item_carteira!(derivativo, item, doc.derivativo[item])
+        end
     end
 
-    ativo_fundo = addelement!(drm, "AtivoFundo")
-    for item in sorted_keys(doc.ativo_fundo)
-        _add_item_carteira!(ativo_fundo, item, doc.ativo_fundo[item])
+    if length(doc.ativo_fundo) > 0
+        ativo_fundo = addelement!(drm, "AtivoFundo")
+        for item in sorted_keys(doc.ativo_fundo)
+            _add_item_carteira!(ativo_fundo, item, doc.ativo_fundo[item])
+        end
     end
 
-    passivo_fundo = addelement!(drm, "PassivoFundo")
-    for item in sorted_keys(doc.passivo_fundo)
-        _add_item_carteira!(passivo_fundo, item, doc.passivo_fundo[item])
+    if length(doc.passivo_fundo) > 0
+        passivo_fundo = addelement!(drm, "PassivoFundo")
+        for item in sorted_keys(doc.passivo_fundo)
+            _add_item_carteira!(passivo_fundo, item, doc.passivo_fundo[item])
+        end
     end
 
-    derivativo_fundo = addelement!(drm, "DerivativoFundo")
-    for item in sorted_keys(doc.derivativo_fundo)
-        _add_item_carteira!(derivativo_fundo, item, doc.derivativo_fundo[item])
+    if length(doc.derivativo_fundo) > 0
+        derivativo_fundo = addelement!(drm, "DerivativoFundo")
+        for item in sorted_keys(doc.derivativo_fundo)
+            _add_item_carteira!(derivativo_fundo, item, doc.derivativo_fundo[item])
+        end
     end
 
-    atividade_financeira = addelement!(drm, "AtividadeFinanceira")
-    for item in sorted_keys(doc.atividade_financeira)
-        _add_item_carteira!(atividade_financeira, item, doc.atividade_financeira[item])
+    if length(doc.atividade_financeira) > 0
+        atividade_financeira = addelement!(drm, "AtividadeFinanceira")
+        for item in sorted_keys(doc.atividade_financeira)
+            _add_item_carteira!(atividade_financeira, item, doc.atividade_financeira[item])
+        end
     end
 
     return xml

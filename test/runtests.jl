@@ -226,8 +226,6 @@ end
           <FluxoVertice CodVertice="01" ValorAlocado="500"/>
         </ItemCarteira>
       </AtivoFundo>
-      <PassivoFundo/>
-      <DerivativoFundo/>
       <AtividadeFinanceira>
         <ItemCarteira Item="AFC" IdPosicao="V" FatorRisco="JM1" CarteiraNegoc="02">
           <FluxoVertice CodVertice="01" ValorAlocado="600"/>
