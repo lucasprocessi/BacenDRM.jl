@@ -68,7 +68,20 @@ function sorted_keys(d::Dict{ItemCarteira, Fluxos})
     return v_keys
 end
 
+function must_be_written(fluxos::Fluxos)
+    # write if any vertice must be written
+    must = false
+    for codigo in sorted_keys(fluxos)
+        vertice = fluxos[codigo]
+        must = must || must_be_written(vertice)
+    end
+    return must
+end
+
 function _add_item_carteira!(node::EzXML.Node, item::ItemCarteira, fluxos::Fluxos)
+    if !must_be_written(fluxos)
+        return nothing
+    end
     node_item = addelement!(node, "ItemCarteira")
     # item::Symbol
     # id_posicao::SymbolOrNothing
@@ -91,11 +104,21 @@ function _add_item_carteira!(node::EzXML.Node, item::ItemCarteira, fluxos::Fluxo
     return node
 end
 
+function must_be_written(vertice::Vertice)
+    valor = _trunc_to_thousands(vertice.valor_alocado)
+    return (valor > 0)
+end
 function _add_fluxo_vertice!(node::EzXML.Node, codigo_vertice::Symbol, vertice::Vertice)
+    # Validate if must be written
+    if !must_be_written(vertice)
+        return nothing
+    end
+    valor = _trunc_to_thousands(vertice.valor_alocado)
+    valor_mam = _trunc_to_thousands(vertice.valor_mam)
     node_fv = addelement!(node, "FluxoVertice")
     link!(node_fv, AttributeNode("CodVertice", "$codigo_vertice"))
-    link!(node_fv, AttributeNode("ValorAlocado", "$(_trunc_to_thousands(vertice.valor_alocado))"))
-    vertice.valor_mam > eps() && link!(node_fv, AttributeNode("ValorMaM", "$(_trunc_to_thousands(vertice.valor_mam))"))
+    link!(node_fv, AttributeNode("ValorAlocado", "$valor"))
+    valor_mam > 0 && link!(node_fv, AttributeNode("ValorMaM", "$valor_mam"))
     return node
 end
 
